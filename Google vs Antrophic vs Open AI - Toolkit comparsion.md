@@ -181,7 +181,7 @@
 | **Fine-tuning** | Yes (Vertex tuning, Gemini supervised tuning) | Phasing out self-serve fine-tuning (May 7, 2026 announcement); inference on FT models continues until base deprecation | Available for select enterprise partners only |
 | **Content guardrails** | Model Armor (prompt injection, sensitive data, tool poisoning) | OpenAI Moderation, Trusted Access for Cyber, GPT-5.5-Cyber preview | Constitutional AI; NNSA-built safety classifiers (nuclear/bio/chem); ASL-3 deployment for Opus |
 
-**Verdict:** For your Product Mate context (AWS Bedrock + MCP + 2,500 engineers), the strongest enterprise readiness package today is **Anthropic on Bedrock under your existing AWS BAA**, plus a thin Vertex AI sidecar for Gemini 3.1 Pro / Veo 3.1 / NotebookLM workloads that need data residency in non-US regions and/or 1M-context multimodal. OpenAI is the third-source provider for terminal/computer-use only.
+**Verdict:** The strongest enterprise readiness package today is **Anthropic on Bedrock under your existing AWS BAA**, plus a thin Vertex AI sidecar for Gemini 3.1 Pro / Veo 3.1 / NotebookLM workloads that need data residency in non-US regions and/or 1M-context multimodal. OpenAI is the third-source provider for terminal/computer-use only.
 
 ---
 
@@ -206,11 +206,11 @@
 
 ---
 
-## Recommendations — For Product Mate (AWS Bedrock + MCP, 2,500+ engineers)
+
 
 ### Stage 1 — Now (Q2 2026)
 1. **Keep Claude on Bedrock as the production default.** Sonnet 4.6 for the 80% of workloads; Haiku 4.5 for routing/classification; Opus 4.7 selectively (gate behind cost guardrails because the new tokenizer can increase effective cost by up to 35%). Enable Bedrock Guardrails for PII and policy enforcement; route all production via VPC endpoints under your AWS BAA.
-2. **Migrate any OpenAI Assistants API code by Aug 26, 2026.** If you have *any* Assistants-API usage in Product Mate's stack, plan migration to OpenAI Responses + Conversations API now. Use the OpenAI Agents SDK for the migration to gain Secure MCP Tunnel + built-in tools.
+2. **Migrate any OpenAI Assistants API code by Aug 26, 2026.** If you have *any* Assistants-API usage in agents stack, plan migration to OpenAI Responses + Conversations API now. Use the OpenAI Agents SDK for the migration to gain Secure MCP Tunnel + built-in tools.
 3. **Adopt the Claude Agent SDK + MCP pattern for new agentic features.** Standardize tool definitions as MCP servers; this gives you vendor portability — the same MCP servers can be consumed by Claude Agent SDK, OpenAI Agents SDK (via Secure MCP Tunnel), and Google ADK 2.0.
 4. **Stand up a second source via Vertex AI** for two specific workloads: (a) document/repo workloads that need 1M+ context with grounding; (b) any video or design-to-code feature (Veo 3.1 + Stitch + Imagen 4). Use this as price/risk leverage in your Anthropic and AWS conversations.
 5. **Implement a model router** for cost optimization. CloudZero's inference-cost research reports "Intelligent routing alone can reduce inference cost by 30 to 60% in mixed-workload environments." Build this in the gateway layer where Product Mate already terminates MCP.

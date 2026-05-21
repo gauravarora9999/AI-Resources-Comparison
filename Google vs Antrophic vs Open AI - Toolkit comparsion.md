@@ -3,10 +3,7 @@
 
 **TL;DR**
 - As of May 21, 2026, there is no single "winner" across the AI stack: **Anthropic Claude Opus 4.7 / Sonnet 4.6** wins complex multi-file coding (64.3% SWE-bench Pro), MCP-native agentic workloads, and enterprise governance on AWS Bedrock; **OpenAI GPT-5.5** wins terminal/computer-use agents (82.7% Terminal-Bench 2.0, 78.7% OSWorld) and consumer distribution; **Google Gemini 3.1 Pro / 3.5 Flash** wins multimodal+video, raw reasoning (94.3% GPQA Diamond), price-per-intelligence at the frontier, and the deepest data-residency footprint.
-- For your **Product Mate** context (AWS Bedrock + MCP, 2,500+ engineers), the architecture verdict is unchanged but sharpened: keep Claude (Sonnet 4.6 default, Opus 4.7 selective, Haiku 4.5 routing) as the primary model layer on Bedrock; add GPT-5.5 via a thin OpenAI-compatible gateway only for terminal-agent and OSWorld-class computer-use workloads; treat Gemini 3.1 Pro on Vertex as a strategic second source for 1M-context document/video workloads and as price leverage. MCP is now table stakes at all three vendors — your existing MCP investment is correctly placed.
-- Three things in `research.txt` that need updating against May 2026 reality: (a) Project Mariner was **shut down on May 4, 2026** — its capability has moved into Gemini in Chrome and the Gemini Agent; (b) OpenAI's **Assistants API is deprecated with an August 26, 2026 sunset** — Responses + Conversations API is the supported successor; (c) **Vertex AI has been rebranded to "Gemini Enterprise Agent Platform"** at Cloud Next '26, and **Gemini CLI is being retired into Antigravity CLI on June 18, 2026**.
 
----
 
 ## Key Findings
 

@@ -161,7 +161,7 @@
 | Claude Team | Anthropic | $25/seat (5+ seats) | Workspace, SSO | Teams |
 | Claude Enterprise | Anthropic | Custom or self-serve (new 2026) | SAML/OIDC SSO, SCIM, audit logs, ZDR, HIPAA BAA, BYOK (H1 2026), private network via Bedrock/Vertex | Regulated industries |
 
-**Notable consumer-side updates since `research.txt`:** Google AI Ultra base price cut from $249.99 to $99.99 at I/O 2026; OpenAI introduced the $100 Pro tier (Apr 9, 2026); ads on Free/Go in US (Feb 9, 2026); ChatGPT Plus rate-limit reductions on GPT-5.5 Thinking (initially 200/week, raised to ~3,000/week after backlash); Anthropic launched self-serve Enterprise.
+**Notable consumer-side updates:** Google AI Ultra base price cut from $249.99 to $99.99 at I/O 2026; OpenAI introduced the $100 Pro tier (Apr 9, 2026); ads on Free/Go in US (Feb 9, 2026); ChatGPT Plus rate-limit reductions on GPT-5.5 Thinking (initially 200/week, raised to ~3,000/week after backlash); Anthropic launched self-serve Enterprise.
 
 ### 10) Governance / Safety / Enterprise Readiness
 

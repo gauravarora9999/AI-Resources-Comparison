@@ -35,7 +35,7 @@
 | **Claude Haiku 4.5** | Anthropic | 200K | $1 / $5 | Near-frontier on routing/classification | Excellent | Fastest in family | Routing, classification, high-volume extraction |
 | **Claude Mythos Preview** (Glasswing-restricted) | Anthropic | 200K | n/a | GPQA Diamond 94.6%, HLE 64.7%, CyberGym 83.1% | TBD | TBD | Cyber/research; only 40 enterprise partners |
 
-**Validating `research.txt` benchmarks against current public data:** Gemini 3.1 Pro GPQA Diamond is 94.1–94.3% (confirmed by Price Per Token, NxCode, Google blog). Opus 4.7 SWE-Bench Pro 64.3% and Verified 87.6% (confirmed by Anthropic + Build Fast with AI). GPT-5.5 Terminal-Bench 2.0 82.7% (confirmed by OpenAI announcement and Artificial Analysis). Claude Sonnet 4.5 OSWorld 61.4% (confirmed by Anthropic blog). If `research.txt` shows Opus 4.6 SWE-bench Verified at 80.8%, that's accurate; the 87.6% number is Opus 4.7 from April 16, 2026.
+** Gemini 3.1 Pro GPQA Diamond is 94.1–94.3% (confirmed by Price Per Token, NxCode, Google blog). Opus 4.7 SWE-Bench Pro 64.3% and Verified 87.6% (confirmed by Anthropic + Build Fast with AI). GPT-5.5 Terminal-Bench 2.0 82.7% (confirmed by OpenAI announcement and Artificial Analysis). Claude Sonnet 4.5 OSWorld 61.4% (confirmed by Anthropic blog). If `research.txt` shows Opus 4.6 SWE-bench Verified at 80.8%, that's accurate; the 87.6% number is Opus 4.7 from April 16, 2026.
 
 ### 2) Android / On-Device / Mobile
 

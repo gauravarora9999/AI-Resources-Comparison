@@ -1,5 +1,4 @@
 # Google vs OpenAI vs Anthropic — Full Portfolio Comparison (May 2026)
-## Platform-Architect Edition for an MCP-native, AWS-Bedrock-Hosted Enterprise GenAI Platform
 
 **TL;DR**
 - As of May 21, 2026, there is no single "winner" across the AI stack: **Anthropic Claude Opus 4.7 / Sonnet 4.6** wins complex multi-file coding (64.3% SWE-bench Pro), MCP-native agentic workloads, and enterprise governance on AWS Bedrock; **OpenAI GPT-5.5** wins terminal/computer-use agents (82.7% Terminal-Bench 2.0, 78.7% OSWorld) and consumer distribution; **Google Gemini 3.1 Pro / 3.5 Flash** wins multimodal+video, raw reasoning (94.3% GPQA Diamond), price-per-intelligence at the frontier, and the deepest data-residency footprint.

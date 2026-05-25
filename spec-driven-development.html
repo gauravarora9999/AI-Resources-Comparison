@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIDLC and the Spec Driven Spotlight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #faf8f3;
+    --bg-alt: #f1ede2;
+    --ink: #1c1c1a;
+    --ink-soft: #4a4a45;
+    --accent: #b8492a;
+    --accent-soft: #d9886a;
+    --rule: #d8d2bf;
+    --highlight: #f5e4a8;
+    --table-header: #2a2a26;
+    --table-stripe: #f5f1e6;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 19px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 60px 32px 120px;
+  }
+  header.hero {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 48px;
+    margin-bottom: 56px;
+  }
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(36px, 5vw, 60px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 24px;
+  }
+  .deck {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin: 0 0 32px;
+  }
+  .meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .meta span::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+  nav.toc {
+    background: var(--bg-alt);
+    border-left: 3px solid var(--accent);
+    padding: 24px 28px;
+    margin: 0 0 56px;
+    font-family: 'Inter', sans-serif;
+  }
+  nav.toc h4 {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  nav.toc ol {
+    margin: 0;
+    padding-left: 20px;
+    columns: 2;
+    column-gap: 32px;
+  }
+  nav.toc li {
+    font-size: 14px;
+    line-height: 1.9;
+    break-inside: avoid;
+  }
+  nav.toc a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+  nav.toc a:hover { border-bottom-color: var(--accent); }
+  article h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: -0.01em;
+    margin: 72px 0 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    line-height: 1.2;
+  }
+  article h2:first-of-type { margin-top: 0; border-top: none; padding-top: 0; }
+  article h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 40px 0 16px;
+  }
+  article p {
+    margin: 0 0 22px;
+    max-width: 720px;
+  }
+  article p .drop {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    float: left;
+    font-size: 64px;
+    line-height: 0.85;
+    padding: 8px 12px 0 0;
+    color: var(--accent);
+  }
+  .pullquote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 26px;
+    line-height: 1.4;
+    color: var(--ink);
+    border-left: 3px solid var(--accent);
+    padding: 4px 0 4px 24px;
+    margin: 36px 0;
+    max-width: 720px;
+  }
+  .callout {
+    background: var(--bg-alt);
+    padding: 24px 28px;
+    border-radius: 4px;
+    margin: 32px 0;
+    font-size: 17px;
+  }
+  .callout strong { color: var(--accent); }
+  .diagram {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 32px;
+    margin: 32px 0;
+    overflow-x: auto;
+    text-align: center;
+  }
+  .diagram-caption {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-top: -16px;
+    margin-bottom: 32px;
+    font-style: italic;
+  }
+  .table-wrap {
+    margin: 28px 0 40px;
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+  }
+  thead th {
+    background: var(--table-header);
+    color: white;
+    font-weight: 600;
+    text-align: left;
+    padding: 14px 18px;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  tbody td {
+    padding: 16px 18px;
+    border-top: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  tbody tr:nth-child(even) { background: var(--table-stripe); }
+  tbody tr td:first-child {
+    font-weight: 600;
+    color: var(--ink);
+    width: 22%;
+  }
+  tbody tr td:nth-child(2) { color: var(--ink-soft); width: 39%; }
+  tbody tr td:nth-child(3) { color: var(--ink); width: 39%; }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+    background: var(--bg-alt);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    margin: 32px 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+  }
+  .compare-grid .head-left, .compare-grid .head-right {
+    padding: 12px 18px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .compare-grid .head-left { text-align: right; }
+  .compare-grid .head-right { text-align: left; color: var(--accent); }
+  .compare-grid .head-mid { }
+  .compare-grid .row-l, .compare-grid .row-r {
+    padding: 14px 18px;
+    border-top: 1px solid var(--rule);
+    line-height: 1.5;
+  }
+  .compare-grid .row-l {
+    text-align: right;
+    color: var(--ink-soft);
+    text-decoration: line-through;
+    text-decoration-color: rgba(184, 73, 42, 0.3);
+  }
+  .compare-grid .row-r { color: var(--ink); font-weight: 500; }
+  .compare-grid .row-arrow {
+    border-top: 1px solid var(--rule);
+    padding: 14px 16px;
+    color: var(--accent);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  pre.code-block {
+    background: #1c1c1a;
+    color: #f5f1e6;
+    padding: 20px 24px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 20px 0 28px;
+  }
+  pre.code-block .c-key { color: #f5d76e; }
+  pre.code-block .c-str { color: #b8e0a8; }
+  pre.code-block .c-com { color: #888880; font-style: italic; }
+  .spec-doc {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 36px 44px;
+    margin: 32px 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .spec-doc .spec-header {
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 16px;
+    margin-bottom: 28px;
+  }
+  .spec-doc .spec-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.05em;
+  }
+  .spec-doc .spec-name {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin-top: 4px;
+    color: var(--ink);
+  }
+  .spec-doc h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin: 28px 0 10px;
+  }
+  .spec-doc p, .spec-doc ul { margin: 0 0 12px; max-width: none; font-size: 15px; }
+  .spec-doc ul { padding-left: 22px; }
+  .spec-doc ul li { margin-bottom: 4px; }
+  .spec-doc .verify {
+    background: var(--bg-alt);
+    padding: 12px 16px;
+    border-left: 3px solid var(--accent);
+    margin: 6px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .spec-doc .ver-id { color: var(--accent); font-weight: 700; }
+  .spec-doc .version-list {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  footer.outro {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid var(--rule);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  @media (max-width: 720px) {
+    body { font-size: 17px; }
+    nav.toc ol { columns: 1; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .compare-grid .row-l { text-align: left; text-decoration: none; }
+    .compare-grid .row-arrow { display: none; }
+    .compare-grid .head-left, .compare-grid .head-mid { display: none; }
+    .compare-grid .head-right { color: var(--accent); }
+    tbody tr td:first-child { width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">AIDLC / Engineering Practice</div>
+  <h1>AIDLC, and Why Spec Driven Development Is the Centre of It</h1>
+  <p class="deck">Agile narrowed the gap between intent and code by shipping faster. AIDLC closes it differently. It makes intent the artifact, and the build a rendering of it.</p>
+  <div class="meta">
+    <span>Gaurav Arora</span>
+    <span>8 minute read</span>
+    <span>May 2026</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <h4>In this piece</h4>
+  <ol>
+    <li><a href="#what">What AIDLC Is</a></li>
+    <li><a href="#spotlight">Spotlight on Spec Driven Development</a></li>
+    <li><a href="#process">Agile vs AIDLC: The Process</a></li>
+    <li><a href="#mindset">Stakeholder and Mindset Shift</a></li>
+    <li><a href="#behaviour">Where Behaviour Has to Change</a></li>
+    <li><a href="#engineering">What Engineering Has to Change</a></li>
+    <li><a href="#flow">A Concrete Flow</a></li>
+    <li><a href="#tools">The Tooling Reality</a></li>
+    <li><a href="#implement">Implementing SDD in an Organisation</a></li>
+    <li><a href="#po">The Product Owner Shift</a></li>
+    <li><a href="#frameworks">Frameworks and Patterns</a></li>
+    <li><a href="#learning">Learning Curve and Maturity</a></li>
+    <li><a href="#sample">Sample Spec: AI Standup Assistant</a></li>
+    <li><a href="#claude">Building the Spec with Claude</a></li>
+    <li><a href="#close">Closing Thought</a></li>
+  </ol>
+</nav>
+
+<article>
+
+<h2 id="what">What AIDLC Is</h2>
+<p><span class="drop">A</span>I Driven Development Lifecycle restructures every phase of delivery (requirements through operations) around the assumption that AI is a primary participant, not a side tool. It does not make Agile faster. It changes what the work is. Less time on keystrokes, more on intent.</p>
+<p>Spec Driven Development sits at the heart of it. Governance, tooling, and role design all flow from the spec.</p>
+
+<h2 id="spotlight">Spotlight on Spec Driven Development</h2>
+<p>A spec is a living markdown file in the repository. Goal, constraints, architectural decisions, task list. One rule. Nothing gets built until the spec exists. The AI reads it before doing anything. Clear spec, clear build. Vague spec, and the vagueness surfaces on day one instead of month six.</p>
+
+<div class="diagram">
+<pre class="mermaid">
+flowchart LR
+    A([Intent]) --> B[Spec in repo]
+    B --> C[AI plan and build]
+    C --> D([Working software])
+    D -.feedback.-> B
+    style B fill:#f5e4a8,stroke:#b8492a,stroke-width:2px
+    style A fill:#fff,stroke:#1c1c1a
+    style D fill:#fff,stroke:#1c1c1a
+</pre>
+</div>
+<p class="diagram-caption">Figure 1. The spec is the contract. The code is a rendering of it.</p>
+
+<p class="pullquote">If you cannot write down what you are building in plain language, you do not know what you are building.</p>
+
+<h2 id="process">Agile vs AIDLC: The Process</h2>
+<p>The shapes are different. Agile loops around the ticket. AIDLC loops around the spec.</p>
+
+<div class="diagram">
+<pre class="mermaid">
+flowchart TB
+    subgraph Agile["AGILE WAYS OF WORKING"]
+        direction LR
+        A1[Backlog] --> A2[Sprint Plan]
+        A2 --> A3[Story]
+        A3 --> A4[Dev Build]
+        A4 --> A5[Demo]
+        A5 --> A6[Retro]
+        A6 --> A1
+    end
+    subgraph AIDLC["AIDLC"]
+        direction LR
+        B1[Spec] --> B2[AI decomposes]
+        B2 --> B3[AI implements]
+        B3 --> B4[Review vs spec]
+        B4 --> B1
+    end
+    style B1 fill:#f5e4a8,stroke:#b8492a,stroke-width:2px
+</pre>
+</div>
+<p class="diagram-caption">Figure 2. Agile cycles through tickets. AIDLC cycles through the spec.</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Parameter</th><th>Agile Ways of Working</th><th>AIDLC</th></tr></thead>
+  <tbody>
+    <tr><td>Primary artifact</td><td>User story in a tracker</td><td>Spec file in the repository</td></tr>
+    <tr><td>Source of truth</td><td>Ticket descriptions plus tribal knowledge</td><td>Versioned spec alongside code</td></tr>
+    <tr><td>Planning cadence</td><td>Two week sprint</td><td>Continuous, triggered by spec change</td></tr>
+    <tr><td>Estimation</td><td>Story points assigned by developer</td><td>Task graph generated from spec</td></tr>
+    <tr><td>Build owner</td><td>Developer</td><td>AI builds, human reviews</td></tr>
+    <tr><td>Quality gate</td><td>Peer code review</td><td>Spec adherence check, then code review</td></tr>
+    <tr><td>Knowledge persistence</td><td>Lives in heads, Slack, ticket history</td><td>Lives in the spec, survives turnover</td></tr>
+    <tr><td>Cost of change</td><td>Reopen ticket, replan sprint</td><td>Edit the spec, regenerate the build</td></tr>
+    <tr><td>Onboarding</td><td>Weeks of context transfer</td><td>Read the spec</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mindset">Stakeholder and Mindset Shift</h2>
+<p>This is where most adoption efforts stall. Tooling is the easy part. The mental model is not.</p>
+
+<div class="diagram">
+<pre class="mermaid">
+flowchart LR
+    subgraph AgileMind["AGILE MINDSET"]
+        M1[Trust the team to figure it out]
+        M2[Iterate toward clarity]
+        M3[Velocity is the metric]
+    end
+    subgraph AIDLCMind["AIDLC MINDSET"]
+        N1[Trust the spec]
+        N2[Clarify before iterating]
+        N3[Intent quality is the metric]
+    end
+    M1 ==shift==> N1
+    M2 ==shift==> N2
+    M3 ==shift==> N3
+    style N1 fill:#f5e4a8,stroke:#b8492a
+    style N2 fill:#f5e4a8,stroke:#b8492a
+    style N3 fill:#f5e4a8,stroke:#b8492a
+</pre>
+</div>
+<p class="diagram-caption">Figure 3. Three beliefs that have to be updated for AIDLC to work.</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Parameter</th><th>Agile Stakeholder</th><th>AIDLC Stakeholder</th></tr></thead>
+  <tbody>
+    <tr><td>Role in planning</td><td>Approves epics, prioritises the backlog</td><td>Co authors the spec</td></tr>
+    <tr><td>Engagement cadence</td><td>Sprint review every two weeks</td><td>At every meaningful spec change</td></tr>
+    <tr><td>Tolerance for ambiguity</td><td>High, "we will figure it out in sprint"</td><td>Low, ambiguity blocks the build</td></tr>
+    <tr><td>Skill required</td><td>Storytelling, prioritisation, negotiation</td><td>Precise written articulation</td></tr>
+    <tr><td>Common failure mode</td><td>Builds the wrong thing efficiently</td><td>Cannot start until intent is real</td></tr>
+    <tr><td>Where time is spent</td><td>Standups, refinements, demos</td><td>Writing and reviewing specs</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="behaviour">Where Behaviour Has to Change</h2>
+<p>Left side is current Agile behaviour. Right side is what AIDLC requires.</p>
+
+<div class="compare-grid">
+  <div class="head-left">TODAY (AGILE)</div>
+  <div class="head-mid"></div>
+  <div class="head-right">AIDLC</div>
+
+  <div class="row-l">Verbal requirements in refinement</div>
+  <div class="row-arrow">&rarr;</div>
+  <div class="row-r">Written spec sections owned by stakeholder</div>
+
+  <div class="row-l">Accept vague acceptance criteria</div>
+  <div class="row-arrow">&rarr;</div>
+  <div class="row-r">Define done before build starts</div>
+
+  <div class="row-l">Reprioritise mid sprint via Slack</div>
+  <div class="row-arrow">&rarr;</div>
+  <div class="row-r">Edit the spec, regenerate the plan</div>
+
+  <div class="row-l">Sign off at demo day</div>
+  <div class="row-arrow">&rarr;</div>
+  <div class="row-r">Sign off at spec, demo is verification</div>
+
+  <div class="row-l">Escalate scope creep in retro</div>
+  <div class="row-arrow">&rarr;</div>
+  <div class="row-r">Scope drift visible in spec diff</div>
+
+  <div class="row-l">PM writes tickets, dev writes code</div>
+  <div class="row-arrow">&rarr;</div>
+  <div class="row-r">Both write spec, AI writes code</div>
+</div>
+
+<div class="callout">
+<strong>Three places stakeholders push back.</strong> Writing things down feels slow when nothing is being built yet. It is not slow. It is the build, in a different medium. The spec also surfaces disagreement that Agile ceremonies usually paper over with optimism. That surfacing is the value, not a defect. Finally, ownership shifts. The product manager who used to approve outcomes now co authors the input. Uncomfortable for a month, then it is not.
+</div>
+
+<h2 id="engineering">What Engineering Has to Change</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Parameter</th><th>Agile Engineering</th><th>AIDLC Engineering</th></tr></thead>
+  <tbody>
+    <tr><td>Definition of done</td><td>Code merged, tests pass</td><td>Spec satisfied, code merged, tests pass</td></tr>
+    <tr><td>Code ownership</td><td>Module or service owners</td><td>Spec owners</td></tr>
+    <tr><td>Review focus</td><td>Diff against previous code</td><td>Diff against spec</td></tr>
+    <tr><td>Architectural decisions</td><td>Captured in ADRs after the fact</td><td>Captured in the spec before code</td></tr>
+    <tr><td>Pairing model</td><td>Two humans on one keyboard</td><td>One human, one AI, one spec</td></tr>
+    <tr><td>Refactoring trigger</td><td>Tech debt review</td><td>Spec change</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="flow">A Concrete Flow</h2>
+
+<div class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant S as Stakeholder
+    participant P as Product
+    participant Sp as Spec
+    participant AI as AI Agent
+    participant E as Engineer
+    S->>P: New requirement
+    P->>Sp: Update spec section
+    Sp->>AI: Spec change detected
+    AI->>AI: Decompose into tasks
+    AI->>E: Propose plan and diffs
+    E->>Sp: Confirm adherence
+    E->>P: Ship
+</pre>
+</div>
+<p class="diagram-caption">Figure 4. The work moves through the spec, not through a standup.</p>
+
+<h2 id="tools">The Tooling Reality</h2>
+<p>The methodology is tool agnostic. Execution is not. A spec only works if the AI doing the build can read it, reason about it, and flag drift from it.</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Parameter</th><th>Agile Tooling Today</th><th>AIDLC Tooling</th></tr></thead>
+  <tbody>
+    <tr><td>Where intent lives</td><td>Jira, Confluence, Slack</td><td>Spec file in the repo</td></tr>
+    <tr><td>Where code lives</td><td>Git</td><td>Git, next to the spec</td></tr>
+    <tr><td>How they stay in sync</td><td>Manual updates, drift is constant</td><td>Spec is the source, build follows</td></tr>
+    <tr><td>Audit trail</td><td>Ticket history</td><td>Spec version history</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Platform Fit</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Tool</th><th>Spec mechanism</th><th>Practical limit</th></tr></thead>
+  <tbody>
+    <tr><td>Claude Code</td><td>CLAUDE.md plus memory plus task system</td><td>Spec structure is convention, not enforced</td></tr>
+    <tr><td>Cursor</td><td>Rules files in <code>.cursor/rules/</code></td><td>Read only, no task tracking, AI cannot revise the spec</td></tr>
+    <tr><td>Kiro</td><td>Native specs in <code>.kiro/specs/</code> with hook enforcement</td><td>Heavy for exploratory work where the spec is still forming</td></tr>
+    <tr><td>Codex / GPT</td><td>No native spec layer</td><td>Stateless, methodology lives in user discipline</td></tr>
+    <tr><td>Gemini Gems</td><td>Persona prompts, not repository aware</td><td>Spec and code drift silently</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Emerging Framework Landscape</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Framework</th><th>What it Standardises</th><th>Where it Fits</th></tr></thead>
+  <tbody>
+    <tr><td>Kiro spec-task-hook</td><td>Spec, generated tasks, file save enforcement</td><td>Greenfield product squads</td></tr>
+    <tr><td>Anthropic SKILL.md</td><td>Reusable spec fragments invoked by agents</td><td>Capability libraries shared across projects</td></tr>
+    <tr><td>OpenAPI plus JSON Schema</td><td>Interface contracts as machine readable spec</td><td>Service boundaries and API design</td></tr>
+    <tr><td>Given / When / Then</td><td>Verification block format</td><td>Behavioural acceptance, regulated work</td></tr>
+    <tr><td>ADR plus Spec</td><td>Decision records embedded in living spec</td><td>Architecture heavy programmes</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="implement">Implementing SDD in an Organisation</h2>
+<p>SDD does not arrive through a memo. One squad runs it, proves the loop, exports the pattern. Start with an honest audit of where intent lives today and how often it gets lost.</p>
+
+<div class="diagram">
+<pre class="mermaid">
+flowchart LR
+    P0[Audit current state] --> P1[Pilot one squad]
+    P1 --> P2[Codify spec standard]
+    P2 --> P3[Embed in 2 to 3 teams]
+    P3 --> P4[Scale by domain]
+    P4 --> P5[Org wide adoption]
+    style P1 fill:#f5e4a8,stroke:#b8492a,stroke-width:2px
+</pre>
+</div>
+<p class="diagram-caption">Figure 5. Phased rollout. Skip a stage and the next one fails.</p>
+
+<h3>Audit Dimensions</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Parameter</th><th>What Agile Audits Look For</th><th>What AIDLC Audits Look For</th></tr></thead>
+  <tbody>
+    <tr><td>Requirements</td><td>User stories with acceptance criteria in Jira</td><td>Spec file present per service, version controlled</td></tr>
+    <tr><td>Definition of done</td><td>Tests pass, PR approved</td><td>Spec satisfied, tests pass, spec diff reviewed</td></tr>
+    <tr><td>Change control</td><td>Change request workflow</td><td>Spec diff is the change request</td></tr>
+    <tr><td>Governance</td><td>Sprint review, steerco</td><td>Spec review board, architecture council</td></tr>
+    <tr><td>Compliance trace</td><td>Ticket history exported on demand</td><td>Git history of the spec is the audit log</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Rollout Plan by Quarter</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Quarter</th><th>Focus</th><th>Exit Criteria</th></tr></thead>
+  <tbody>
+    <tr><td>Q1</td><td>Audit, pick pilot, define spec template</td><td>One squad shipping through specs, template signed off</td></tr>
+    <tr><td>Q2</td><td>Pilot runs in parallel with Agile, measure both</td><td>Cycle time and rework data captured for comparison</td></tr>
+    <tr><td>Q3</td><td>Codify standards, train second cohort</td><td>Three squads on SDD, spec linter in CI</td></tr>
+    <tr><td>Q4</td><td>Scale across one domain, retire ceremonies that no longer add value</td><td>Whole domain on SDD, Jira role reduced to coordination only</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout">
+<strong>Three risks during rollout.</strong> Cultural resistance from teams who equate writing with bureaucracy. A spec literacy gap that no one wants to admit. Governance lag, where audit and risk functions still demand artefacts the new process does not produce. Surface all three in the audit. None of them surprise you later if you name them now.
+</div>
+
+<h2 id="po">The Product Owner Shift</h2>
+<p>Product owners spend their day inside Jira. Stories, epics, acceptance criteria, refinements, standups. AIDLC pulls almost all of that work into the spec. The PO does not disappear. The work moves.</p>
+
+<div class="diagram">
+<pre class="mermaid">
+flowchart LR
+    subgraph Today["TODAY"]
+        J[Jira Story] --> POa[PO writes description and ACs]
+        POa --> Da[Dev interprets and codes]
+    end
+    subgraph Tomorrow["AIDLC"]
+        SP[Spec Section] --> POb[PO co authors with engineer]
+        POb --> AIa[AI plans and builds]
+        AIa --> R[PO reviews against spec]
+    end
+    style SP fill:#f5e4a8,stroke:#b8492a,stroke-width:2px
+</pre>
+</div>
+<p class="diagram-caption">Figure 6. The PO moves from describing work to defining intent.</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Parameter</th><th>Product Owner in Agile</th><th>Product Owner in AIDLC</th></tr></thead>
+  <tbody>
+    <tr><td>Primary tool</td><td>Jira</td><td>Spec file in the repository</td></tr>
+    <tr><td>Output</td><td>Story with acceptance criteria</td><td>Spec section with intent, constraints, examples</td></tr>
+    <tr><td>Cadence</td><td>Daily standup, weekly refinement</td><td>Spec authoring sessions, async review</td></tr>
+    <tr><td>Core skill</td><td>Storytelling, prioritisation</td><td>Precise written articulation</td></tr>
+    <tr><td>Success measure</td><td>Velocity, throughput</td><td>Spec clarity, build acceptance rate</td></tr>
+    <tr><td>Time allocation</td><td>60% in meetings</td><td>60% writing and reviewing specs</td></tr>
+    <tr><td>Coverage</td><td>One or two squads</td><td>One or two domains</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Jira to Spec Mapping</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Jira Concept</th><th>Maps to in SDD</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Epic</td><td>Spec module</td><td>Top level outcome and constraints</td></tr>
+    <tr><td>Story</td><td>Spec task block</td><td>Single behaviour, owned by one spec section</td></tr>
+    <tr><td>Acceptance criteria</td><td>Verification block inside the spec</td><td>Given, when, then format works well</td></tr>
+    <tr><td>Bug</td><td>Spec gap or implementation drift</td><td>Fix the spec first if intent was wrong</td></tr>
+    <tr><td>Standup update</td><td>Spec diff comment</td><td>Async, visible, traceable</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="pullquote">The PO who used to approve outcomes now co authors the input. Different job, same goal.</p>
+
+<h2 id="frameworks">Frameworks and Patterns</h2>
+<p>SDD is still consolidating. The patterns below show up across the teams that have made it work for more than a quarter. Treat them as building blocks, not a rulebook.</p>
+
+<div class="diagram">
+<pre class="mermaid">
+flowchart TB
+    SS[System Spec]
+    SS --> DS1[Domain Spec A]
+    SS --> DS2[Domain Spec B]
+    DS1 --> MS1[Module Spec]
+    DS1 --> MS2[Module Spec]
+    DS2 --> MS3[Module Spec]
+    MS1 --> V1[Verification Block]
+    MS2 --> V2[Verification Block]
+    MS3 --> V3[Verification Block]
+    style SS fill:#f5e4a8,stroke:#b8492a,stroke-width:2px
+</pre>
+</div>
+<p class="diagram-caption">Figure 7. Hierarchical spec structure. System level intent flows down. Verification flows up.</p>
+
+<h3>Pattern Catalogue</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Pattern</th><th>When to Use</th><th>Common Pitfall</th></tr></thead>
+  <tbody>
+    <tr><td>Spec First</td><td>All new builds</td><td>Treating it as optional under deadline pressure</td></tr>
+    <tr><td>Spec as ADR</td><td>Architectural choice required</td><td>Burying the decision in prose with no rationale</td></tr>
+    <tr><td>Living Spec</td><td>Long lived services</td><td>Spec rot when the team rotates and no one owns it</td></tr>
+    <tr><td>Hierarchical Spec</td><td>Large systems, multiple domains</td><td>Over fragmenting and losing the system view</td></tr>
+    <tr><td>Verification Block</td><td>Anywhere correctness matters</td><td>Vague pass criteria that read like marketing copy</td></tr>
+    <tr><td>Spec Diff Review</td><td>High change velocity teams</td><td>Reviewing code PRs without checking spec changes</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="learning">Learning Curve and Maturity</h2>
+<p>Different curve for every role. Treat it as a capability ladder, not a course. Five levels of fluency, twelve weeks to get a cohort from Level 1 to Level 3.</p>
+
+<div class="diagram">
+<pre class="mermaid">
+flowchart LR
+    L0[Level 0<br/>Aware] --> L1[Level 1<br/>Reads spec]
+    L1 --> L2[Level 2<br/>Edits spec]
+    L2 --> L3[Level 3<br/>Authors spec]
+    L3 --> L4[Level 4<br/>Reviews spec]
+    L4 --> L5[Level 5<br/>Coaches others]
+    style L3 fill:#f5e4a8,stroke:#b8492a,stroke-width:2px
+</pre>
+</div>
+<p class="diagram-caption">Figure 8. The maturity ladder. Most stakeholders need to reach Level 3 for the model to compound.</p>
+
+<h3>Iterative Training Plan, 12 Weeks</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Weeks</th><th>Focus</th><th>Exercise</th></tr></thead>
+  <tbody>
+    <tr><td>1 to 2</td><td>Read existing specs</td><td>Annotate three live specs from the repo, ask one question per section</td></tr>
+    <tr><td>3 to 4</td><td>Edit specs for known features</td><td>Pair edit with an engineer, ship one merged spec change</td></tr>
+    <tr><td>5 to 6</td><td>Author a small spec</td><td>Write the spec for one real ticket, get it through review</td></tr>
+    <tr><td>7 to 8</td><td>Review others</td><td>Approve or reject five spec PRs with written reasoning</td></tr>
+    <tr><td>9 to 10</td><td>Lead a spec session</td><td>Run a spec authoring workshop for the next cohort</td></tr>
+    <tr><td>11 to 12</td><td>Coach</td><td>Pair with a new joiner for two weeks, hand them Level 1</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Common Stumbling Blocks by Role</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Role</th><th>What Trips Them Up</th><th>What Unblocks Them</th></tr></thead>
+  <tbody>
+    <tr><td>Developer</td><td>Trust gap with AI generated code</td><td>Pair on small spec, ship one win, then scale</td></tr>
+    <tr><td>Product Owner</td><td>Writes narratives instead of intent</td><td>Templates with intent, constraint, verification fields</td></tr>
+    <tr><td>QA</td><td>Used to test plans, not verification blocks</td><td>Convert one existing test plan into a verification block</td></tr>
+    <tr><td>EM</td><td>Measures velocity, not spec quality</td><td>New scorecard with spec clarity and acceptance rate</td></tr>
+    <tr><td>Business stakeholder</td><td>Specifies solutions, not problems</td><td>Spec prompt asks "what changes for the user" first</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="sample">Sample Spec: AI Standup Assistant</h2>
+<p>What a working spec actually looks like. Compact, every section present. Goal here is shape, not exhaustive detail. Notice that nothing in this file is in Jira, in Confluence, or in someone's head.</p>
+
+<div class="spec-doc">
+  <div class="spec-header">
+    <div class="spec-title">SPEC.md &middot; v1.2 &middot; owners: @engineering, @product</div>
+    <div class="spec-name">AI Standup Assistant</div>
+  </div>
+
+  <h4>1. Goal</h4>
+  <p>Retire the synchronous daily standup for a 12 person engineering squad. Each member receives a Slack DM at 09:00 local, answers three async questions, and the bot composes a team summary posted to the squad channel at 10:00.</p>
+
+  <h4>2. Non Goals</h4>
+  <ul>
+    <li>Not a project management tool</li>
+    <li>Not a 1:1 coaching surface</li>
+    <li>No video, audio, or transcription support</li>
+    <li>No integration with Jira in v1</li>
+  </ul>
+
+  <h4>3. Users and Stakeholders</h4>
+  <ul>
+    <li>Engineers (12, primary users, daily interaction)</li>
+    <li>Engineering Manager (consumer of the summary)</li>
+    <li>Product Owner (read access to summary channel)</li>
+  </ul>
+
+  <h4>4. Constraints</h4>
+  <ul>
+    <li>Slack only, must work on Slack Free tier</li>
+    <li>Three timezones: London, Bangalore, San Francisco</li>
+    <li>No PII storage beyond Slack user ID</li>
+    <li>p95 summary generation under 30 seconds</li>
+    <li>Monthly LLM spend under &pound;50</li>
+  </ul>
+
+  <h4>5. Architecture Decisions</h4>
+  <ul>
+    <li>LLM: Claude Sonnet for summary. Auto fallback to Haiku if monthly spend exceeds &pound;40</li>
+    <li>Storage: Postgres on Fly.io, 90 day retention, then anonymise</li>
+    <li>Deployment: single container, no orchestration</li>
+    <li>No queue, direct invocation is acceptable at 12 users</li>
+    <li>Scheduler: cron in app, not external service, to keep ops surface small</li>
+  </ul>
+
+  <h4>6. Data Model</h4>
+<pre class="code-block"><span class="c-key">StandupResponse</span> {
+  id: uuid
+  user_id: string         <span class="c-com">// Slack user ID</span>
+  date: date
+  answers: { yesterday, today, blockers }
+  submitted_at: timestamp
+}
+
+<span class="c-key">DailySummary</span> {
+  id: uuid
+  squad_id: string
+  date: date
+  body: text
+  posted_at: timestamp
+}</pre>
+
+  <h4>7. Interfaces</h4>
+  <ul>
+    <li>Slack interactive DM at 09:00 local with a modal form</li>
+    <li>Slash command <code>/standup</code> for manual submission</li>
+    <li>Channel post at 10:00 local with the composed summary</li>
+    <li>Internal endpoint <code>POST /admin/regenerate</code> for EM override</li>
+  </ul>
+
+  <h4>8. Behaviours</h4>
+  <ul>
+    <li><strong>B1.</strong> Engineer receives DM at 09:00 in their local timezone</li>
+    <li><strong>B2.</strong> Engineer submits via Slack modal or <code>/standup</code></li>
+    <li><strong>B3.</strong> Bot composes summary at 10:00 local even if responses are incomplete</li>
+    <li><strong>B4.</strong> Blockers section appears in the summary even if only one engineer reports one</li>
+    <li><strong>B5.</strong> If an engineer does not respond for three consecutive days, the bot DMs the EM</li>
+  </ul>
+
+  <h4>9. Verification Blocks</h4>
+  <div class="verify"><span class="ver-id">V1.</span> Given 09:00 in user timezone, when scheduler fires, then DM is sent within 60 seconds</div>
+  <div class="verify"><span class="ver-id">V2.</span> Given engineer submits at 09:45, when 10:00 fires, then their response appears in the summary</div>
+  <div class="verify"><span class="ver-id">V3.</span> Given zero responses received, when 10:00 fires, then summary states "no responses today" instead of failing</div>
+  <div class="verify"><span class="ver-id">V4.</span> Given monthly LLM spend exceeds &pound;40, when next summary runs, then provider switches to Haiku and posts a notice in #eng-ops</div>
+  <div class="verify"><span class="ver-id">V5.</span> Given an engineer has missed three days, when day three summary runs, then EM receives a DM with the user ID</div>
+
+  <h4>10. Task Graph</h4>
+<div class="diagram" style="background:var(--bg-alt);">
+<pre class="mermaid">
+flowchart LR
+    T1[T1 Slack app scaffold] --> T2[T2 Postgres schema]
+    T2 --> T3[T3 Scheduler cron]
+    T3 --> T4[T4 DM modal]
+    T4 --> T5[T5 Response capture]
+    T5 --> T6[T6 LLM summary]
+    T6 --> T7[T7 Channel post]
+    T7 --> T8[T8 Spend guardrail]
+    T8 --> T9[T9 EM escalation]
+</pre>
+</div>
+
+  <h4>11. Open Questions</h4>
+  <ul>
+    <li>Do we want sentiment tracking in v2 or is that out of scope by design</li>
+    <li>Should holidays auto pause the bot per user calendar</li>
+    <li>Is anonymous mode required for any team</li>
+  </ul>
+
+  <h4>12. Acceptance</h4>
+  <ul>
+    <li>V1 through V5 pass in integration tests against a sandbox Slack workspace</li>
+    <li>EM approves three consecutive daily summaries without manual edits</li>
+    <li>Engineering squad votes to retire the synchronous standup at sprint 14</li>
+  </ul>
+
+  <h4>13. Version History</h4>
+  <p class="version-list">
+    v1.0 &middot; 2026-04-12 &middot; initial draft<br>
+    v1.1 &middot; 2026-04-19 &middot; added timezone handling after pilot feedback<br>
+    v1.2 &middot; 2026-04-26 &middot; added B4 blocker behaviour and V4 spend guardrail
+  </p>
+</div>
+
+<p>Around 400 words. The AI reads it, picks up the task graph, starts work. When the spec changes, the build follows.</p>
+
+<h2 id="claude">Building the Spec with Claude</h2>
+<p>Taking the standup spec above into Claude Code. Same spec, three files at the repo root, and the build loop runs itself.</p>
+
+<h3>Repository Setup</h3>
+<pre class="code-block"><span class="c-com">// repo root</span>
+SPEC.md                  <span class="c-com">// the standup assistant spec from above</span>
+CLAUDE.md                <span class="c-com">// build rules and pointers</span>
+memory/
+  architecture.md        <span class="c-com">// stable decisions across sessions</span>
+  decisions.md
+src/</pre>
+
+<h3>CLAUDE.md, the Entry Point</h3>
+<pre class="code-block">## Build Rules
+1. Read SPEC.md before any code change
+2. Every commit references a spec section (B1, V1, T1)
+3. Tests follow the V block ID convention
+4. Propose spec edits via PR before implementation
+
+## Active Spec
+SPEC.md v1.2, AI Standup Assistant
+
+## Current Task
+T3 Scheduler cron, satisfies B1 and V1
+
+## Memory
+See memory/architecture.md and memory/decisions.md</pre>
+
+<h3>A Real Session</h3>
+<p>Prompt: <em>"Implement T3 from the task graph. Must satisfy B1 and V1."</em></p>
+<p>Claude reads SPEC.md, locates T3, B1, V1. Proposes a node cron scheduler with timezone handling. Writes <code>v1_dm_sent_within_60s</code> test against a Slack mock. Commits with message <code>T3 scheduler cron, satisfies B1 / V1</code>. Updates memory/decisions.md with the cron choice and why.</p>
+<p>Two days later, B5 escalation needs adding. Claude opens a spec PR first, increments to v1.3, gets approval, then implements. The spec leads, the code follows.</p>
+
+<div class="diagram">
+<pre class="mermaid">
+flowchart LR
+    P[Prompt with task ID] --> R[Read SPEC.md and CLAUDE.md]
+    R --> I[Identify section, B, V, T blocks]
+    I --> M[Check memory for decisions]
+    M --> B[Build and write tests]
+    B --> C[Commit with spec ref]
+    C --> U[Update memory if decision new]
+    style R fill:#f5e4a8,stroke:#b8492a,stroke-width:2px
+</pre>
+</div>
+<p class="diagram-caption">Figure 9. The Claude build loop. Spec in, traceable diff out.</p>
+
+<h3>Why This Works in Claude</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Parameter</th><th>Generic AI Tool</th><th>Claude Code on SDD</th></tr></thead>
+  <tbody>
+    <tr><td>Context loading</td><td>Manual paste each session</td><td>CLAUDE.md and SPEC.md read every session</td></tr>
+    <tr><td>Multi step execution</td><td>One prompt, one diff</td><td>Native agentic loop across the task graph</td></tr>
+    <tr><td>Cross session memory</td><td>None, restart from zero</td><td>Memory directory survives sessions</td></tr>
+    <tr><td>Task tracking</td><td>You hold it in your head</td><td>Built in task tool tied to spec sections</td></tr>
+    <tr><td>Spec edits</td><td>Manual rewrite</td><td>AI proposes spec diff with rationale</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout">
+<strong>One rule that makes or breaks the setup.</strong> Keep CLAUDE.md under 100 lines. It loads on every session. Long files become noise. The spec carries the detail. CLAUDE.md just points at it.
+</div>
+
+<h2 id="close">Closing Thought</h2>
+<p>AIDLC is not Agile with AI bolted on the side. It is a different operating model. The spec replaces the standup as the heartbeat of delivery. Stakeholders who learn to write specs gain real leverage in how systems get built. The ones who treat AIDLC as a tooling decision will get the same outcomes they got from Agile, only with a faster cycle time and a bigger AI bill.</p>
+
+</article>
+
+<footer class="outro">
+  <div>Gaurav Arora &middot; 2026</div>
+  <div>Spec is the work.</div>
+</footer>
+
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '14px',
+      primaryColor: '#faf8f3',
+      primaryTextColor: '#1c1c1a',
+      primaryBorderColor: '#1c1c1a',
+      lineColor: '#4a4a45',
+      secondaryColor: '#f1ede2',
+      tertiaryColor: '#ffffff',
+      clusterBkg: '#f1ede2',
+      clusterBorder: '#b8492a',
+      edgeLabelBackground: '#faf8f3'
+    },
+    flowchart: { curve: 'basis', padding: 20 },
+    sequence: { actorMargin: 60, boxMargin: 10 }
+  });
+</script>
+</body>
+</html>
